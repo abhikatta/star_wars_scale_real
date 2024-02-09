@@ -4,7 +4,8 @@ import { useStarWarsData } from "./hooks/myHooks";
 const App = () => {
   const data = useStarWarsData();
   const [searchFor, setSearchFor] = useState<string>();
-
+  const [currentSelectedID, setCurrentSelectedID] = useState<number>();
+  const [sortBy, setSortBy] = useState<string>();
   function formatTitle(num: number, title: string): string {
     var lookup: any = {
         M: 1000,
@@ -31,12 +32,15 @@ const App = () => {
     }
     return `Episode ${roman} - ${title}`;
   }
-  return data ? (
+  return (
     <>
-      <nav className="h-[3rem] px-2 items-center flex flex-row justify-between gap-3 ">
-        <select value={"asds"} className="  rounded-md px-2 py-1">
-          <option className="">asd1</option>
-          <option className="">asd2</option>
+      <nav className="h-[3rem] bg-slate-300 items-center flex flex-row max-w-screen ">
+        <select value={"Sort By.."} className="rounded-md px-2 py-1">
+          <option disabled hidden>
+            Sort By..
+          </option>
+          <option>Episode</option>
+          <option>Year</option>
         </select>
         <input
           className="w-full rounded-sm  px-2 py-1  outline-none"
@@ -45,31 +49,45 @@ const App = () => {
           onChange={(e) => setSearchFor(e.target.value)}
           placeholder="Type to Search..."></input>
       </nav>
-      <div
-        className="h-full min-h-screen w-full py-10 px-5 
-     ">
-        <div className="w-full flex flex-row justify-between">
-          <div className="flex flex-col w-full">
-            {data?.results.map((v, i) => {
-              return (
-                <div className=" border-b-[1px] py-4 flex flex-row  gap-3">
-                  <p>EPISODE {v.episode_id}</p>
-                  <p>{formatTitle(v.episode_id, v.title)}</p>
-                </div>
-              );
-            })}
-          </div>
-          <hr className="rotate-90"></hr>
-          <div className="w-full">
-            {/* <p>{data?.results[0].opening_crawl}</p> */}
+      {data ? (
+        <div className=" min-h-screen w-full px-5 h-screen">
+          <div className="w-full flex flex-row justify-between">
+            <div className="flex flex-col w-full">
+              {data?.results.map((v, i) => {
+                return (
+                  <div
+                    onClick={() => setCurrentSelectedID(v.episode_id)}
+                    className=" border-b-[1px] py-4 flex flex-row  gap-3">
+                    <p>EPISODE {v.episode_id}</p>
+                    <p>{formatTitle(v.episode_id, v.title)}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="w-full px-4 border-l-2 items-center">
+              {currentSelectedID ? (
+                <>
+                  <p>
+                    {formatTitle(
+                      currentSelectedID,
+                      data.results[currentSelectedID - 1]?.title
+                    )}
+                  </p>
+                  <p>{data?.results[currentSelectedID - 1]?.opening_crawl}</p>
+                </>
+              ) : (
+                <p>asdhjasbhdj</p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="h-auto pt-[20%] w-screen max-w-screen flex items-center justify-center text-2xl">
+          <p>Loading...</p>
+        </div>
+      )}
     </>
-  ) : (
-    <div className="h-screen w-screen flex items-center justify-center text-2xl">
-      <p>Loading...</p>
-    </div>
   );
 };
 
