@@ -57,27 +57,37 @@ const App = () => {
                 return (
                   <div
                     onClick={() => setCurrentSelectedID(v.episode_id)}
-                    className=" border-b-[1px] py-4 flex flex-row  gap-3">
-                    <p>EPISODE {v.episode_id}</p>
-                    <p>{formatTitle(v.episode_id, v.title)}</p>
+                    className="border-b-[1px] py-4 flex flex-row justify-between gap-3 px-5
+                     hover:cursor-pointer hover:bg-slate-50">
+                    <div className="flex flex-row justify-between items-center">
+                      <p className="text-xs pr-10">EPISODE {v.episode_id}</p>
+                      <p>{formatTitle(v.episode_id, v.title)}</p>
+                    </div>
+                    <p>{v.release_date}</p>
                   </div>
                 );
               })}
             </div>
 
-            <div className="w-full px-4 border-l-2 items-center">
+            <div className="w-full px-4 h-screen border-l-2 items-center">
               {currentSelectedID ? (
-                <>
-                  <p>
+                <div className=" flex flex-col h-full w-full items-start justify-start p-4">
+                  <p className="text-xl text-slate-700 pb-5">
                     {formatTitle(
                       currentSelectedID,
                       data.results[currentSelectedID - 1]?.title
                     )}
                   </p>
                   <p>{data?.results[currentSelectedID - 1]?.opening_crawl}</p>
-                </>
+                  <p className="pt-5">
+                    Directed by:{" "}
+                    {data?.results[currentSelectedID - 1]?.director}
+                  </p>
+                </div>
               ) : (
-                <p>asdhjasbhdj</p>
+                <div className=" flex h-full w-full items-center justify-center">
+                  <p>No movie selected</p>
+                </div>
               )}
             </div>
           </div>
