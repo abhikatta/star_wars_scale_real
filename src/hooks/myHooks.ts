@@ -12,11 +12,17 @@ const useStarWarsData = () => {
       .then((data) => {
         console.log(data);
         setData(data);
+        localStorage.setItem("data", JSON.stringify(data));
+        return null;
       });
   };
 
   useEffect(() => {
-    fetchStarWarsData();
+    if (localStorage.getItem("data") === null) {
+      fetchStarWarsData();
+    } else {
+      setData(JSON.parse(localStorage.getItem("data") || ""));
+    }
   }, []);
 
   return data;

@@ -1,40 +1,16 @@
 import { useState } from "react";
 import { useStarWarsData } from "./hooks/myHooks";
+import { formatTitle } from "./utils/romanNum";
 
 const App = () => {
   const data = useStarWarsData();
   const [searchFor, setSearchFor] = useState<string>();
   const [currentSelectedID, setCurrentSelectedID] = useState<number>();
   const [sortBy, setSortBy] = useState<string>();
-  function formatTitle(num: number, title: string): string {
-    var lookup: any = {
-        M: 1000,
-        CM: 900,
-        D: 500,
-        CD: 400,
-        C: 100,
-        XC: 90,
-        L: 50,
-        XL: 40,
-        X: 10,
-        IX: 9,
-        V: 5,
-        IV: 4,
-        I: 1,
-      },
-      roman = "",
-      i;
-    for (i in lookup) {
-      while (num >= lookup[i]) {
-        roman += i;
-        num -= lookup[i];
-      }
-    }
-    return `Episode ${roman} - ${title}`;
-  }
+
   return (
     <>
-      <nav className="h-[3rem] bg-slate-300 items-center flex flex-row max-w-screen ">
+      <nav className="h-[3rem] bg-slate-800 items-center flex flex-row max-w-screen ">
         <select value={"Sort By.."} className="rounded-md px-2 py-1">
           <option disabled hidden>
             Sort By..
@@ -56,7 +32,10 @@ const App = () => {
               {data?.results.map((v, i) => {
                 return (
                   <div
-                    onClick={() => setCurrentSelectedID(v.episode_id)}
+                    onClick={() => {
+                      console.log(i, v.episode_id);
+                      setCurrentSelectedID(v.episode_id);
+                    }}
                     className="border-b-[1px] py-4 flex flex-row justify-between gap-3 px-5
                      hover:cursor-pointer hover:bg-slate-50">
                     <div className="flex flex-row justify-between items-center">
@@ -75,13 +54,25 @@ const App = () => {
                   <p className="text-xl text-slate-700 pb-5">
                     {formatTitle(
                       currentSelectedID,
-                      data.results[currentSelectedID - 1]?.title
+                      data?.results.find(
+                        (a) => a.episode_id === currentSelectedID
+                      )?.title
                     )}
                   </p>
-                  <p>{data?.results[currentSelectedID - 1]?.opening_crawl}</p>
+                  <p>
+                    {
+                      data?.results.find(
+                        (a) => a.episode_id === currentSelectedID
+                      )?.opening_crawl
+                    }
+                  </p>
                   <p className="pt-5">
                     Directed by:{" "}
-                    {data?.results[currentSelectedID - 1]?.director}
+                    {
+                      data?.results.find(
+                        (a) => a.episode_id === currentSelectedID
+                      )?.director
+                    }
                   </p>
                 </div>
               ) : (
