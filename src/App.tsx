@@ -1,42 +1,59 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStarWarsData } from "./hooks/myHooks";
 import { formatTitle } from "./utils/romanNum";
-import { StarWarsData } from "./types";
+import { StarWarsData, sortType } from "./types";
 
 const App = () => {
   const data = useStarWarsData();
   const [searchFor, setSearchFor] = useState<string>();
   const [currentSelectedID, setCurrentSelectedID] = useState<number>();
-  const [sortBy, setSortBy] = useState<string>();
+  const [sortBy, setSortBy] = useState<string | null>(null);
   const [movies, setMovies] = useState<StarWarsData["results"] | null>();
+
   useEffect(() => {
     setMovies(data?.results);
   }, [data]);
+
+  const sortItems = useMemo(() => {
+    if (movies) {
+      let sortMovies = [...movies];
+
+      if (sortBy === sortType.episode.ascending) {
+        sortMovies = sortMovies.sort((a, b) => a.episode_id - b.episode_id);
+      } else if (sortBy === sortType.episode.descending) {
+        sortMovies = sortMovies.sort((a, b) => b.episode_id - a.episode_id);
+      } else if (sortBy === sortType.year.ascending) {
+        sortMovies = sortMovies.sort((a, b) => {
+          const movie1: string = a.release_date;
+          const movie2: string = b.release_date;
+          return movie1 > movie2 ? 1 : movie1 < movie2 ? -1 : 0;
+        });
+      } else if (sortBy === sortType.year.descending) {
+        sortMovies = sortMovies.sort((a, b) => {
+          const movie1 = a.release_date;
+          const movie2 = b.release_date;
+          return movie1 < movie2 ? 1 : movie1 > movie2 ? -1 : 0;
+        });
+      }
+
+      return sortMovies;
+    }
+
+    return movies;
+  }, [sortBy, movies]);
+
   const filteredItems = useMemo(() => {
     if (movies) {
-      let searchMovies = [...movies];
+      let searchMovies = [...(sortItems ?? movies)];
 
       if (searchFor && searchFor.length > 0) {
         searchMovies = searchMovies?.filter((item) =>
           item.title.toLowerCase().includes(searchFor.toLowerCase())
         );
-      } else if (sortBy) {
-        if (sortBy === "episode") {
-          searchMovies = searchMovies.sort(
-            (a, b) => a.episode_id - b.episode_id
-          );
-        } else if (sortBy === "year") {
-          searchMovies = searchMovies.sort((a, b) => {
-            const movie1 = a.release_date;
-            const movie2 = b.release_date;
-            return movie1 > movie2 ? -1 : movie1 < movie2 ? 1 : 0;
-          });
-        }
       }
-
       return searchMovies;
     } else return movies;
-  }, [movies, searchFor, sortBy]);
+  }, [movies, searchFor, sortItems]);
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
@@ -50,14 +67,24 @@ const App = () => {
     <>
       <nav className="h-[3rem] px-5 gap-5 bg-slate-800 items-center flex flex-row max-w-screen ">
         <select
-          value={sortBy}
+          value={sortBy || ""}
           onChange={(e) => setSortBy(e.target.value)}
           className="rounded-sm px-2 py-1">
-          <option value={""} hidden>
-            Sort By..
-          </option>
-          <option value={"year"}>Year</option>
-          <option value={"episode"}>Episode</option>
+          <optgroup label="Year">
+            <option value={""} hidden>
+              Sort By..
+            </option>
+            <option value={sortType.year.ascending}>Year Ascending</option>
+            <option value={sortType.year.descending}>Year Descending</option>
+          </optgroup>
+          <optgroup label="Episode">
+            <option value={sortType.episode.ascending}>
+              Episode Ascending
+            </option>
+            <option value={sortType.episode.descending}>
+              Episode Descending
+            </option>
+          </optgroup>
         </select>
         <input
           className="w-full rounded-sm  px-2 py-1  outline-none"

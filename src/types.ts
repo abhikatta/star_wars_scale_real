@@ -21,3 +21,14 @@ export type StarWarsData = {
     }
   ];
 };
+
+export const sortType = {
+  year: {
+    ascending: "YEAR_ASCENDING",
+    descending: "YEAR_DESCENDING",
+  },
+  episode: {
+    ascending: "EPISODE_ASCENDING",
+    descending: "EPISODE_DESCENDING",
+  },
+};
