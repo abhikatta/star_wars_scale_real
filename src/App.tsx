@@ -21,11 +21,12 @@ const App = () => {
           item.title.toLowerCase().includes(searchFor.toLowerCase())
         );
       } else if (sortBy) {
-        let sortMovies = [...movies];
         if (sortBy === "episode") {
-          sortMovies = sortMovies.sort((a, b) => a.episode_id - b.episode_id);
+          searchMovies = searchMovies.sort(
+            (a, b) => a.episode_id - b.episode_id
+          );
         } else if (sortBy === "year") {
-          sortMovies = sortMovies.sort((a, b) => {
+          searchMovies = searchMovies.sort((a, b) => {
             const movie1 = a.release_date;
             const movie2 = b.release_date;
             return movie1 > movie2 ? -1 : movie1 < movie2 ? 1 : 0;
@@ -35,7 +36,7 @@ const App = () => {
 
       return searchMovies;
     } else return movies;
-  }, [movies, searchFor]);
+  }, [movies, searchFor, sortBy]);
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
