@@ -67,7 +67,7 @@ const App = () => {
           placeholder="Type to Search..."></input>
       </nav>
       {filteredItems ? (
-        <div className=" min-h-screen w-full px-5 h-screen">
+        <div className=" w-full px-5 lg:h-[90vh]">
           <div className="w-full flex flex-row justify-between">
             <div className="flex flex-col w-full">
               {filteredItems?.map((v, i) => {
@@ -90,7 +90,7 @@ const App = () => {
               })}
             </div>
 
-            <div className="w-full px-4 h-screen border-l-2 items-center">
+            <div className="w-full px-4 lg:h-[93.5vh] h-full border-l-2 items-center">
               {currentSelectedID ? (
                 <div className=" flex flex-col h-full w-full items-start justify-start p-4">
                   <p className="text-xl text-slate-700 pb-5">
