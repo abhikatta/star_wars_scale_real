@@ -14,7 +14,8 @@ const useStarWarsData = () => {
         setData(data);
         localStorage.setItem("data", JSON.stringify(data));
         return null;
-      });
+      })
+      .catch((error: Error) => console.log(error.message));
   };
 
   useEffect(() => {

@@ -1,5 +1,3 @@
-import { StarWarsData } from "../types";
-
 export function formatTitle(num: number, title: string | undefined): string {
   var lookup: any = {
       M: 1000,
@@ -25,15 +23,4 @@ export function formatTitle(num: number, title: string | undefined): string {
     }
   }
   return `Episode ${roman} - ${title ? title : ""}`;
-}
-export function getDetails(
-  data: StarWarsData["results"],
-  currentSelectedID: number
-) {
-  for (let index = 0; index < data.length; index++) {
-    const element = data[index];
-    if (element.episode_id == currentSelectedID) {
-      return [data[index]];
-    }
-  }
 }

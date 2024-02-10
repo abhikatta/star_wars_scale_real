@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStarWarsData } from "./hooks/myHooks";
 import { formatTitle } from "./utils/romanNum";
 import { StarWarsData } from "./types";
@@ -8,42 +8,49 @@ const App = () => {
   const [searchFor, setSearchFor] = useState<string>();
   const [currentSelectedID, setCurrentSelectedID] = useState<number>();
   const [sortBy, setSortBy] = useState<string>();
-  const [sortResults, setSortResults] = useState<
-    StarWarsData["results"] | null
-  >();
+  const [movies, setMovies] = useState<StarWarsData["results"] | null>();
   useEffect(() => {
-    if (data?.results) {
-      setSortResults(data.results);
-    }
+    setMovies(data?.results);
   }, [data]);
-  function sortData(value: string) {
-    setSortBy(value);
-    if (value === "episode") {
-      const newSortedData = sortResults?.sort(
-        (a, b) => a.episode_id - b.episode_id
-      );
-      setSortResults(newSortedData);
-    } else if (value === "year") {
-      const newSortedData = sortResults?.sort((a, b) => {
-        const data1 = a.release_date.toUpperCase();
-        const data2 = b.release_date.toUpperCase();
-        if (data1 > data2) {
-          return 1;
-        } else if (data1 < data2) {
-          return -1;
-        } else {
-          return 0;
+  const filteredItems = useMemo(() => {
+    if (movies) {
+      let searchMovies = [...movies];
+
+      if (searchFor && searchFor.length > 0) {
+        searchMovies = searchMovies?.filter((item) =>
+          item.title.toLowerCase().includes(searchFor.toLowerCase())
+        );
+      } else if (sortBy) {
+        let sortMovies = [...movies];
+        if (sortBy === "episode") {
+          sortMovies = sortMovies.sort((a, b) => a.episode_id - b.episode_id);
+        } else if (sortBy === "year") {
+          sortMovies = sortMovies.sort((a, b) => {
+            const movie1 = a.release_date;
+            const movie2 = b.release_date;
+            return movie1 > movie2 ? -1 : movie1 < movie2 ? 1 : 0;
+          });
         }
-      });
-      setSortResults(newSortedData);
+      }
+
+      return searchMovies;
+    } else return movies;
+  }, [movies, searchFor]);
+
+  const onSearchChange = useCallback((value?: string) => {
+    if (value) {
+      setSearchFor(value);
+    } else {
+      setSearchFor("");
     }
-  }
+  }, []);
 
   return (
     <>
       <nav className="h-[3rem] px-5 gap-5 bg-slate-800 items-center flex flex-row max-w-screen ">
         <select
-          onChange={(e) => sortData(e.target.value)}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
           className="rounded-sm px-2 py-1">
           <option value={""} hidden>
             Sort By..
@@ -55,14 +62,14 @@ const App = () => {
           className="w-full rounded-sm  px-2 py-1  outline-none"
           type="text"
           value={searchFor}
-          onChange={(e) => setSearchFor(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Type to Search..."></input>
       </nav>
-      {sortResults ? (
+      {filteredItems ? (
         <div className=" min-h-screen w-full px-5 h-screen">
           <div className="w-full flex flex-row justify-between">
             <div className="flex flex-col w-full">
-              {sortResults?.map((v, i) => {
+              {filteredItems?.map((v, i) => {
                 return (
                   <div
                     key={i}
@@ -88,24 +95,21 @@ const App = () => {
                   <p className="text-xl text-slate-700 pb-5">
                     {formatTitle(
                       currentSelectedID,
-                      data?.results.find(
-                        (a) => a.episode_id === currentSelectedID
-                      )?.title
+                      movies?.find((a) => a.episode_id === currentSelectedID)
+                        ?.title
                     )}
                   </p>
                   <p>
                     {
-                      data?.results.find(
-                        (a) => a.episode_id === currentSelectedID
-                      )?.opening_crawl
+                      movies?.find((a) => a.episode_id === currentSelectedID)
+                        ?.opening_crawl
                     }
                   </p>
                   <p className="pt-5">
                     Directed by:{" "}
                     {
-                      data?.results.find(
-                        (a) => a.episode_id === currentSelectedID
-                      )?.director
+                      movies?.find((a) => a.episode_id === currentSelectedID)
+                        ?.director
                     }
                   </p>
                 </div>
