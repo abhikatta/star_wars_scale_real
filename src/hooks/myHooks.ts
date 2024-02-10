@@ -21,6 +21,8 @@ const useStarWarsData = () => {
     if (localStorage.getItem("data") === null) {
       fetchStarWarsData();
     } else {
+      console.log("data fetched from localStorage");
+
       setData(JSON.parse(localStorage.getItem("data") || ""));
     }
   }, []);
